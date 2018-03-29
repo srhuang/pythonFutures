@@ -1,6 +1,14 @@
-# -*- coding: UTF-8 -*-
+##=============================
+#name:TXfilter.py
+#argument:
+#	input file:csv file
+#author:srhuang
+#email:lukyandy3162@gmail.com
+#=============================
 
-#載入相關套件及函數
+#===============
+#import section
+#===============
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
@@ -9,15 +17,29 @@ import os
 from os.path import exists
 import calendar
 
-#check and create output folder
-print os.path.basename(__file__)
-print "Current Folder:"+os.getcwd()
-outputFolder=sys.argv[2]
+#================
+#variable section
+#================
+outputFolder="TXfilter/"
+PRODUCT="TX"
+count=1
+intraday_amount=0
+afterHours_amount=0
+intraday_cross_month=0
+afterHours_cross_month=0
 
+#=================
+#argument section
+#=================
 file_path=sys.argv[1]
-test=sys.argv[1].split('/')[1].split('_')
-day=test[3].split('.')[0]
+file_name=sys.argv[1].split('/')[1].split('_')
+year=file_name[1].zfill(4)
+month=file_name[2].zfill(2)
+day=file_name[3].split('.')[0].zfill(2)
 
+#=================
+#function section
+#=================
 def find_third_wednesdays(year, month):
     wednesdays = [week[calendar.WEDNESDAY] for week in calendar.monthcalendar(year, month)]
     if wednesdays[0] == 0:
@@ -26,45 +48,56 @@ def find_third_wednesdays(year, month):
     	third_wednesday = wednesdays[2]
     return third_wednesday
 
-ticketday=find_third_wednesdays(int(test[1]), int(test[2]))
-print "ticketday : "+test[1]+test[2]+str(ticketday).zfill(2)
+#===============
+#progress start
+#===============
+print ">>>>> "+os.path.basename(__file__)+" "+sys.argv[1]
+#print "Current Folder:"+os.getcwd()
 
-#print day
-if int(day) >ticketday:
-	next_month=int(test[2])+1
-	month_string=test[1]+str(next_month).zfill(2)
+#check the input file
+if exists(file_path):
+	input_file = open ( file_path,"r" )
 else:
-	month_string= test[1]+test[2]
-print "month_string : "+month_string
-PRODUCT="TX"
+	print file_path+" is NOT exist."
+	sys.exit(0)
 
-#Prepare the output file
-file = open(outputFolder+PRODUCT+"_"+test[1]+test[2]+test[3],'w')
+#check and open the output file
+if exists(outputFolder+PRODUCT+"_"+year+month+day+".csv"):
+	print PRODUCT+"_"+year+month+day+".csv" + " is already exist."
+	sys.exit(0)
+else:
+	output_file = open(outputFolder+PRODUCT+"_"+year+month+day+".csv",'w')
 
-#Filter the TX 台指期大台, MTX 小台
-count=1
-intraday_amount=0
-afterHours_amount=0
-intraday_cross_month=0
-afterHours_cross_month=0
-fileHandle = open ( file_path,"r" )
-lineList = fileHandle.readlines()
+#calculate the ticketday
+ticketday=find_third_wednesdays(int(year), int(month))
+print "ticketday : "+year+month+str(ticketday).zfill(2)
+
+#determine the contract month
+if int(day) > ticketday:
+	next_month = int(month)+1
+	contract_month = year+str(next_month).zfill(2)
+else:
+	contract_month = year+month
+print "Contract Month : "+contract_month
+
+#write the TX into filter file
+lineList = input_file.readlines()
 for line in lineList[1:-1]:
 	Input=line.replace(" ", "").split(",")
 	#non cross month
-	if Input[1]==PRODUCT and Input[2]==month_string:
+	if Input[1]==PRODUCT and Input[2]==contract_month:
 		if (int(Input[3])>=84500) and (int(Input[3])<=134500):
 			intraday_amount+=int(Input[5])
-			file.write(line)
+			output_file.write(line)
 		else:
 			afterHours_amount+=int(Input[5])
 	#cross month
-	if Input[1]==PRODUCT and (month_string+"/") in Input[2]:
+	if Input[1]==PRODUCT and (contract_month+"/") in Input[2]:
 		if (int(Input[3])>=84500) and (int(Input[3])<=134500):
 			intraday_cross_month+=int(Input[5])
 		else:
 			afterHours_cross_month+=int(Input[5])
-	count+=1
+
 # Intrday
 print "intraday amount:",intraday_amount/2
 print "intraday cross month:",intraday_cross_month/4
@@ -77,4 +110,6 @@ print "After-hours cross month:",afterHours_cross_month/4
 afterHours_total=afterHours_amount/2+afterHours_cross_month/4
 print "After-hours trading:", afterHours_total
 
+#total amount
 print "total amount:", intraday_total+afterHours_total
+print "<<<<< "+os.path.basename(__file__)+" done."

@@ -10,11 +10,12 @@ from matplotlib import ticker as mticker
 from matplotlib.ticker import NullFormatter
 from matplotlib.dates import AutoDateLocator
 import matplotlib
-
+import os
 import sys
 file_name=sys.argv[1]
+print ">>>>> "+os.path.basename(__file__)+" "+sys.argv[1]+" "+sys.argv[2]
 
-import os
+'''
 print os.path.basename(__file__)
 print "Current Folder:"+os.getcwd()
 outputFolder=sys.argv[2]
@@ -170,3 +171,4 @@ ax2.tick_params(axis='y', colors='w')
 plt.title(date, color="w")
 #plt.show()
 plt.savefig(outputFolder+sys.argv[1].split('/')[1].split('_')[1].split('.')[0]+".png", facecolor='#07000d')
+'''
