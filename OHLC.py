@@ -1,4 +1,4 @@
-##=============================
+#=============================
 #name:OHLC.py
 #argument:
 # input file:csv file
@@ -110,5 +110,6 @@ print "Lowest Price :", lowPrice, "Highest Price :", highPrice
 for data in OHLC:
   line=str(mdates.num2date(data[0]).time())+" "+str(data[1])+" "+str(data[2])+" "+str(data[3])+" "+str(data[4])+" "+str(data[5])+"\n"
   output_file.write(line)
-  
+output_file.write(str(lowPrice)+" "+str(highPrice))
+
 print "<<<<< "+os.path.basename(__file__)+" done."
