@@ -24,7 +24,7 @@ OHLC_dir="OHLC/"
 OHLC_list=[]
 OHLC_pre_list=[]
 OHLC_current_month=OHLC_dir+"OHLC_"+str(year).zfill(4)+str(month).zfill(2)+".csv"
-
+MAlen = 60
 #=================
 #argument section
 #=================
@@ -64,9 +64,27 @@ for day in days:
 		OHLC_list+=[OHLC_file]
 print OHLC_list
 
+#calculate pre month
+d = datetime.date(year, month, 1) - relativedelta(months=1)
+premonth = d.month
+OHLC_pre_month=OHLC_dir+"OHLC_"+str(year).zfill(4)+str(premonth).zfill(2)+".csv"
+
 #combine all OHLC in one month
 total_amount=0
 with open(OHLC_current_month, 'w') as outfile:
+	#write the pre month
+	if not exists(OHLC_pre_month):
+		print str(day.year).zfill(4)+str(day.month).zfill(2)+str(day.day).zfill(2)+" OHLC_pre_month is empty."
+	else:
+		with open(OHLC_pre_month) as pre_infile:
+			num_lines = sum(1 for line in open(OHLC_pre_month))
+			line_count=1
+			for line in pre_infile:
+				if line_count > (num_lines-MAlen):
+					outfile.write(line)
+				line_count+=1
+
+	#write the current month
 	for fname in OHLC_list:
 		with open(OHLC_dir+fname) as infile:
 			num_lines = sum(1 for line in open(OHLC_dir+fname))
@@ -78,11 +96,6 @@ with open(OHLC_current_month, 'w') as outfile:
 				line_count+=1
 print "#days:"+str(len(OHLC_list))+" , total amount : "+str(total_amount)
 
-#calculate pre month
-d = datetime.date(year, month, 1) - relativedelta(months=1)
-premonth = d.month
-OHLC_pre_month=OHLC_dir+"OHLC_"+str(year).zfill(4)+str(premonth).zfill(2)+".csv"
-
 #draw the candle stick
 num_days = calendar.monthrange(year, month)[1]
 days = [datetime.date(year, month, day) for day in range(1, num_days+1)]
@@ -93,10 +106,4 @@ for day in days:
 		continue
 	#start draw candle stick
 	index=OHLC_list.index(OHLC_file)
-	if index==0:
-		if not exists(OHLC_pre_month):
-			print str(day.year).zfill(4)+str(day.month).zfill(2)+str(day.day).zfill(2)+" OHLC_pre_month is empty."
-			continue
-		os.system("python candleStick.py " + OHLC_dir+OHLC_file+" "+OHLC_dir+OHLC_pre_month)
-	else:
-		os.system("python candleStick.py " + OHLC_dir+OHLC_file+" "+OHLC_dir+OHLC_current_month)
+	os.system("python candleStick.py " + OHLC_dir+OHLC_file+" "+OHLC_current_month)

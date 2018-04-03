@@ -38,7 +38,6 @@ closeprice=0
 line_count=1
 
 MAlen = 60
-MAarray = []
 MA = []
 MAValue = 0
 
@@ -46,7 +45,7 @@ MAValue = 0
 #argument section
 #=================
 current_file_name=sys.argv[1]
-last_file_name=sys.argv[2]
+month_OHLC_file=sys.argv[2]
 current_date=sys.argv[1].split("_")[1].split(".")[0]
 
 #=================
@@ -64,6 +63,26 @@ def NumbertoTime(sec):
  sec=sec/60
  TH=str(sec%60).zfill(2)
  return TH+TM+TS
+
+def calculateMAValue(current_date, current_time):
+  #get current day line in file
+  current_day_line=0
+  month_OHLC = open ( month_OHLC_file,"r" )
+  for i, line in enumerate(month_OHLC):
+    if (line.split(" ")[0] == str(current_date)) and (line.split(" ")[1] == str(current_time)):
+      current_day_line=i
+
+  if current_day_line<MAlen:
+    return 0
+  #parsing the MA data
+  MAarray = []
+  month_OHLC = open ( month_OHLC_file,"r" )
+  for i, line in enumerate(month_OHLC):
+    if (i > current_day_line-MAlen) and (i <= current_day_line):
+      MAarray+=[int(line.split(" ")[5])]
+
+  MAValue=float(sum(MAarray))/len(MAarray)
+  return round(MAValue)
 
 #===============
 #progress start
@@ -94,35 +113,25 @@ for line in lineList:
     lowPrice=int(Input[0])
     highPrice=int(Input[1])
   else:
-    OHLC+=[[mdates.date2num(datetime.datetime.strptime(Input[0], "%H:%M:%S")), int(Input[1]), int(Input[2]), int(Input[3]), int(Input[4]), int(Input[5])]]
+    current_time=mdates.date2num(datetime.datetime.strptime(Input[0], "%H:%M:%S"))
+    OHLC+=[[current_time, int(Input[1]), int(Input[2]), int(Input[3]), int(Input[4]), int(Input[5])]]
+    #print mdates.num2date(current_time).time()
+    MAValue=calculateMAValue(current_date, mdates.num2date(current_time).time())
+    if MAValue!=0:
+      MA.extend([MAValue])
   line_count+=1
-'''
-#Calculate the MA data
-if exists(last_file_name):
-  input_file = open ( last_file_name,"r" )
-  num_lines = sum(1 for line in open(last_file_name))
+
+#Check month OHLC file
+if exists(month_OHLC_file):
+  input_file = open ( month_OHLC_file,"r" )
+  num_lines = sum(1 for line in open(month_OHLC_file))
 else:
-  print last_file_name+" is NOT exist."
+  print month_OHLC_file+" is NOT exist."
   sys.exit(0)
 
-for i in OHLC:
-  time=i[0]
-  price=int(i[4])
-  if len(MAarray)==0:
-    MAarray+=[price]
-  else:
-    if time<STime+Cycle:
-      MAarray[-1]=price
-    else:
-      if len(MAarray)==MAlen:
-        MAarray=MAarray[1:]+[price]
-      else:
-        MAarray+=[price]   
-    STime = STime+Cycle
-  MAValue=float(sum(MAarray))/len(MAarray)
-  print mdates.num2date(time).time(), MAValue
-  #MA.extend([MAValue])
-'''
+if MA:
+  print MA
+
 #定義圖表物件
 fig = plt.figure(facecolor='#07000d',edgecolor='#07000d', figsize=(15,10))
 ax1 = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, axisbg='#07000d')
