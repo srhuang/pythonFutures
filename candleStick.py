@@ -131,7 +131,8 @@ else:
 
 if MA:
   print MA
-
+maxMA=max(MA)
+minMA=min(MA)
 #定義圖表物件
 fig = plt.figure(facecolor='#07000d',edgecolor='#07000d', figsize=(15,10))
 ax1 = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, axisbg='#07000d')
@@ -152,7 +153,8 @@ ax1.set_xticks([ line[0] for line in timeTick[::12] ])
 ax1.xaxis.label.set_color("w")
 plt.xlabel("Open: "+str(openprice)+" , "+"High: "+str(highPrice)+" , "+"Low: "+str(lowPrice)+" , "+"Close: "+str(closeprice))
 
-ax1.set_yticks(np.arange((lowPrice/100)*100, (highPrice/100+1)*100+20, step=20))
+ax1.set_yticks(np.arange((min(lowPrice, minMA)/100-1)*100, (max(highPrice, maxMA)/100+1)*100, step=20))
+ax1.get_yaxis().get_major_formatter().set_useOffset(False)
 ax1.yaxis.label.set_color("w")
 plt.ylabel('Futures price and Volume')
 
@@ -171,6 +173,9 @@ ax2.spines['left'].set_color("#5998ff")
 ax2.spines['right'].set_color("#5998ff")
 ax2.tick_params(axis='x', colors='w')
 ax2.tick_params(axis='y', colors='w')
+
+#draw the MA line
+ax1.plot_date(Time, MA, 'y-', linewidth=3)
 
 plt.title(current_date, color="w")
 plt.savefig(outputFolder+sys.argv[1].split('/')[1].split('_')[1].split('.')[0]+".png", facecolor='#07000d')
