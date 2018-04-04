@@ -153,7 +153,7 @@ ax1.set_xticks([ line[0] for line in timeTick[::12] ])
 ax1.xaxis.label.set_color("w")
 plt.xlabel("Open: "+str(openprice)+" , "+"High: "+str(highPrice)+" , "+"Low: "+str(lowPrice)+" , "+"Close: "+str(closeprice))
 
-ax1.set_yticks(np.arange((min(lowPrice, minMA)/100-1)*100, (max(highPrice, maxMA)/100+1)*100, step=20))
+ax1.set_yticks(np.arange((min(lowPrice, minMA)//100-1)*100, (max(highPrice, maxMA)//100+1)*100, step=20))
 ax1.get_yaxis().get_major_formatter().set_useOffset(False)
 ax1.yaxis.label.set_color("w")
 plt.ylabel('Futures price and Volume')
