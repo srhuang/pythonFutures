@@ -2,8 +2,8 @@
 #=============================
 #name:candleStick.py
 #argument:
-# current month OHLC:csv file
-# last month OHLC   :csv file
+# current day OHLC      :csv file
+# current month OHLC    :csv file
 #author:srhuang
 #email:lukyandy3162@gmail.com
 #=============================
@@ -40,6 +40,8 @@ line_count=1
 MAlen = 60
 MA = []
 MAValue = 0
+maxMA=0
+minMA=99999
 
 #=================
 #argument section
@@ -131,8 +133,9 @@ else:
 
 if MA:
   print MA
-maxMA=max(MA)
-minMA=min(MA)
+if MA: 
+  maxMA=max(MA)
+  minMA=min(MA)
 #定義圖表物件
 fig = plt.figure(facecolor='#07000d',edgecolor='#07000d', figsize=(15,10))
 ax1 = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, axisbg='#07000d')
@@ -140,7 +143,9 @@ ax1 = plt.subplot2grid((6,4), (1,0), rowspan=4, colspan=4, axisbg='#07000d')
 #繪製K線圖
 candlestick_ohlc(ax1, OHLC, width=0.002, colorup='r', colordown='green', alpha=1)
 ax1.grid(True, color='w', alpha=0.5)
+ax1.axhline(y=(min(lowPrice, minMA)//100)*100,c="#5998ff" ,linewidth=0.5,zorder=0)
 ax1.spines['bottom'].set_color("#5998ff")
+ax1.axhline(y=(max(highPrice, maxMA)//100+1)*100,c="#5998ff" ,linewidth=0.5,zorder=0)
 ax1.spines['top'].set_color("#5998ff")
 ax1.spines['left'].set_color("#5998ff")
 ax1.spines['right'].set_color("#5998ff")
@@ -153,7 +158,8 @@ ax1.set_xticks([ line[0] for line in timeTick[::12] ])
 ax1.xaxis.label.set_color("w")
 plt.xlabel("Open: "+str(openprice)+" , "+"High: "+str(highPrice)+" , "+"Low: "+str(lowPrice)+" , "+"Close: "+str(closeprice))
 
-ax1.set_yticks(np.arange((min(lowPrice, minMA)//100-1)*100, (max(highPrice, maxMA)//100+1)*100, step=20))
+ax1.set_yticks(np.arange((min(lowPrice, minMA)//100)*100-100, (max(highPrice, maxMA)//100)*100+100, step=20))
+#ax1.set_ybound((min(lowPrice, minMA)//100)*100-100, (max(highPrice, maxMA)//100)*100+100)
 ax1.get_yaxis().get_major_formatter().set_useOffset(False)
 ax1.yaxis.label.set_color("w")
 plt.ylabel('Futures price and Volume')
@@ -175,7 +181,15 @@ ax2.tick_params(axis='x', colors='w')
 ax2.tick_params(axis='y', colors='w')
 
 #draw the MA line
-ax1.plot_date(Time, MA, 'y-', linewidth=3)
+if MA:
+  ax1.plot_date(Time, MA, 'y-', linewidth=1)
+
+#draw line
+ax1.axhline(y=OHLC[0][1]+60,c="#ec890e",linewidth=3,zorder=0)
+ax1.axhline(y=OHLC[0][1]+20,c="#42ec0e",linewidth=3,zorder=0)
+ax1.axhline(y=OHLC[0][1],c="#9907A8",linewidth=3,zorder=0)
+ax1.axhline(y=OHLC[0][1]-20,c="#42ec0e",linewidth=3,zorder=0)
+ax1.axhline(y=OHLC[0][1]-60,c="#ec890e",linewidth=3,zorder=0)
 
 plt.title(current_date, color="w")
 plt.savefig(outputFolder+sys.argv[1].split('/')[1].split('_')[1].split('.')[0]+".png", facecolor='#07000d')
