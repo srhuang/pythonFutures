@@ -18,7 +18,7 @@ from dateutil.relativedelta import *
 #variable section
 #================
 year = 2018
-month = 03
+month = 05
 make_up_days=[str(datetime.date(2018, 03, 31)), str(datetime.date(2018, 12, 22))]
 OHLC_dir="OHLC/"
 OHLC_list=[]

@@ -185,11 +185,11 @@ if MA:
   ax1.plot_date(Time, MA, 'y-', linewidth=1)
 
 #draw line
-ax1.axhline(y=OHLC[0][1]+60,c="#ec890e",linewidth=3,zorder=0)
-ax1.axhline(y=OHLC[0][1]+20,c="#42ec0e",linewidth=3,zorder=0)
-ax1.axhline(y=OHLC[0][1],c="#9907A8",linewidth=3,zorder=0)
-ax1.axhline(y=OHLC[0][1]-20,c="#42ec0e",linewidth=3,zorder=0)
-ax1.axhline(y=OHLC[0][1]-60,c="#ec890e",linewidth=3,zorder=0)
+ax1.axhline(y=OHLC[0][1]+60,c="#ec890e",linewidth=1,zorder=0)
+ax1.axhline(y=OHLC[0][1]+20,c="#42ec0e",linewidth=1,zorder=0)
+ax1.axhline(y=OHLC[0][1],c="#9907A8",linewidth=1,zorder=0)
+ax1.axhline(y=OHLC[0][1]-20,c="#42ec0e",linewidth=1,zorder=0)
+ax1.axhline(y=OHLC[0][1]-60,c="#ec890e",linewidth=1,zorder=0)
 
 plt.title(current_date, color="w")
 plt.savefig(outputFolder+sys.argv[1].split('/')[1].split('_')[1].split('.')[0]+".png", facecolor='#07000d')
