@@ -18,14 +18,15 @@ from dateutil.relativedelta import *
 #variable section
 #================
 year = 2018
-month = 02
+month = 9
 make_up_days=[str(datetime.date(2018, 03, 31)), str(datetime.date(2018, 12, 22))]
 OHLC_dir="OHLC/"
 OHLC_list=[]
 OHLC_pre_list=[]
 OHLC_current_month=OHLC_dir+"OHLC_"+str(year).zfill(4)+str(month).zfill(2)+".csv"
 MAlen = 60
-policy_profit="momentum_policy.csv"
+policy_name="trend"
+policy_profit=policy_name+".csv"
 #=================
 #argument section
 #=================
@@ -52,7 +53,7 @@ for day in days:
 	OHLC_file="OHLC_"+str(year)+str(month).zfill(2)+str(day.day).zfill(2)+".csv"
 	if not exists(OHLC_dir+OHLC_file):
 		continue
-	os.system("python momentum_policy.py " + OHLC_dir+OHLC_file)
+	os.system("python "+policy_name+".py " + OHLC_dir+OHLC_file)
 
 #calculate profit
 total_profit=0
